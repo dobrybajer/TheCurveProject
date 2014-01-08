@@ -29,7 +29,7 @@ public class MainActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.button_start:
-                    Intent intent = new Intent(MainActivity.this, GameActivity.class);
+                    Intent intent = new Intent(MainActivity.this, LogActivity.class);
                     startActivity(intent);
                     break;
                 case R.id.button_close:
