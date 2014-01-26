@@ -18,28 +18,17 @@ public class GameActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        ArrayList<String> gamers= new ArrayList<String>();
-        ArrayList<Integer> mWspStart=new ArrayList<Integer>();
 
-        if(intent.getStringArrayListExtra("test") != null)
+        Message message=null;
+        if(intent.getParcelableExtra("Message") != null)
         {
-             gamers=intent.getStringArrayListExtra("test");
-        }else {
-            gamers.add("mis");
-        }
-
-        if(intent.getStringArrayListExtra("startwsp") != null)
-        {
-            mWspStart=intent.getIntegerArrayListExtra("startwsp");
-        }else {
-            mWspStart.add(150);
-            mWspStart.add(150);
+            message=intent.getParcelableExtra("Message");
         }
 
         PowerManager mPowerManager = (PowerManager) getSystemService(POWER_SERVICE);
         mWakeLock = mPowerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, getClass().getName());
         mGameSurfaceView = new GameSurfaceView(this);
-        mGameSurfaceView.setPlayerList(gamers,mWspStart);
+        mGameSurfaceView.setPlayerList(message.getNames(),message.getWsp());
         setContentView(mGameSurfaceView);
     }
 

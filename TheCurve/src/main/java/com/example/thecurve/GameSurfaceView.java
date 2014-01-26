@@ -106,10 +106,10 @@ public class GameSurfaceView extends SurfaceView implements SensorEventListener,
                 mPlayerList.add(new Player(Color.BLUE,gam));
 
             }
-        }/*else if(newlist.isEmpty()==true)
+        }else if(newlist.isEmpty()==true)
         {
             mPlayerList.add(new Player(Color.BLUE,"misp"));
-        }*/
+        }
         int indexx=0;
 
         if(newwsp.isEmpty()==false)
@@ -125,11 +125,11 @@ public class GameSurfaceView extends SurfaceView implements SensorEventListener,
                 pla.getLine().mAngle=(float)newwsp.get(indexx+3);
                 indexx+=4;
             }
-        }/*else if( newwsp.isEmpty()==true)
+        }else if( newwsp.isEmpty()==true)
         {
             mLogic = new Logic((Activity) this.getContext());
             mLogic.setPlayersOnStart(mPlayerList.get(0));
-        }*/
+        }
 
     }
 

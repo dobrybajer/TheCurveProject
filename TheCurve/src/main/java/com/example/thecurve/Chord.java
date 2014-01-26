@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Chord extends LogActivity{
+public class Chord extends Activity{
 
     private ChordManager mChordManager =null;
     private String PlayerName;

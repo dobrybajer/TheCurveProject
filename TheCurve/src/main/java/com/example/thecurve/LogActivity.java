@@ -6,6 +6,7 @@ import android.content.Intent;
 
 import android.os.Bundle;
 
+import android.os.Parcelable;
 import android.view.View;
 
 import android.widget.Button;
@@ -22,6 +23,7 @@ import com.samsung.chord.IChordManagerListener;
 
 import com.example.thecurve.Player;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,12 +94,13 @@ public class LogActivity extends Activity {
     {
             try {
             Intent intent = new Intent(this,GameActivity.class);
-            intent.putStringArrayListExtra("test", _names);
-            intent.putIntegerArrayListExtra("startwsp", _Wsp);
+            Message message=new Message(_names,_Wsp);
+
+            intent.putExtra("Message", message);
             startActivity(intent);
             }
             catch(Exception e)
-            {
+           {
              SetText("Intent Error");
 
             }
@@ -111,3 +114,5 @@ public class LogActivity extends Activity {
 
 
 }
+
+
