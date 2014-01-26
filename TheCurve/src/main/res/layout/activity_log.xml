@@ -1,0 +1,43 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LogActivity"
+    tools:ignore="MergeRootFrame"
+    android:background="@drawable/background">
+
+
+     <Button
+            android:id="@+id/button_game"
+            android:layout_height="75dp"
+            android:layout_width="fill_parent"
+            android:layout_weight="1"
+            android:text="@string/button_game" />
+    <Button
+        android:id="@+id/button_chord"
+        android:layout_height="75dp"
+        android:layout_width="fill_parent"
+        android:layout_weight="1"
+        android:layout_marginTop="75dp"
+        android:text="@string/button_chord"/>
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_height="75dp"
+        android:layout_width="fill_parent"
+        android:layout_marginTop="150dp"
+        android:layout_weight="1"
+        android:editable="true"
+        android:text="@string/text2"/>
+    
+    <EditText
+        android:id="@+id/player_name"
+        android:layout_height="75dp"
+        android:layout_width="fill_parent"
+        android:layout_marginTop="225dp"
+        android:hint="@string/name"/>
+    
+
+
+</FrameLayout>

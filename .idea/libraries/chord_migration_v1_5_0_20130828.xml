@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="chord-migration-v1.5.0-20130828">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/TheCurve/libs/chord-migration-v1.5.0-20130828.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
