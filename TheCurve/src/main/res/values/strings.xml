@@ -11,5 +11,8 @@
     <string name="title_activity_log">MainLogActivity</string>
     <string name="button_game">Start Game</string>
     <string name="button_chord">Chord</string>
-
+    <string name="text2">Hakunamatata</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="name">Enter the name</string>
 </resources>

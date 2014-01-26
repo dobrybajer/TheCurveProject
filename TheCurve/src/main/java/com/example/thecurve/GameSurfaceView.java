@@ -16,6 +16,9 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GameSurfaceView extends SurfaceView implements SensorEventListener, Runnable {
 
     private SensorManager mSensorManager;
@@ -37,8 +40,13 @@ public class GameSurfaceView extends SurfaceView implements SensorEventListener,
     private float mSensorZ;
     private long mSensorTimeStamp;
 
+    public List<Player> mPlayerList=new ArrayList<Player>();
+    //public List<Integer> wsp =new ArrayList<Integer>();
     private Player mPlayer;
+    //private Player mPlayer2;
     private Logic mLogic;
+
+    private boolean mStart;
 
     public GameSurfaceView(Context context) {
         super(context);
@@ -52,9 +60,11 @@ public class GameSurfaceView extends SurfaceView implements SensorEventListener,
         mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
+
         mPlayer = new Player(Color.GREEN, "Kamil");
-        mLogic = new Logic((Activity) this.getContext());
-        mLogic.setPlayersOnStart(mPlayer);
+        //mLogic = new Logic((Activity) this.getContext());
+
+           mStart=true;
 
         mBitmapPoint = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
         mainCanvas = new Canvas(mBitmapPoint);
@@ -64,16 +74,74 @@ public class GameSurfaceView extends SurfaceView implements SensorEventListener,
     }
 
     public void Compute() {
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setStrokeWidth(mPlayer.getLine().mSize);
-        paint.setColor(mPlayer.getColor());
+           for(int index=0;index<mPlayerList.size();index++)
+           {
+            mPlayer=mPlayerList.get(index);
 
-        float x = mPlayer.getLine().mX;
-        float y = mPlayer.getLine().mY;
+            //mLogic = new Logic((Activity) this.getContext());
+            //mLogic.setPlayersOnStart(mPlayer);
 
-        mLogic.movePlayer(mBitmapPoint, mPlayer, mSensorY);
-        mainCanvas.drawLine(x, y, mPlayer.getLine().mX, mPlayer.getLine().mY, paint);
+            Paint paint = new Paint();
+            paint.setAntiAlias(true);
+            paint.setStrokeWidth(mPlayer.getLine().mSize);
+            paint.setColor(mPlayer.getColor());
+
+            float x = mPlayer.getLine().mX;
+            float y = mPlayer.getLine().mY;
+
+            mLogic.movePlayer(mBitmapPoint, mPlayer, mSensorY);
+            mainCanvas.drawLine(x, y, mPlayer.getLine().mX, mPlayer.getLine().mY, paint);
+
+            //wysłanie obliczonych punktow
+           }
+
+    }
+
+    public void setPlayerList(ArrayList<String> newlist,ArrayList<Integer> newwsp)
+    {
+        if(newlist.isEmpty()==false)
+        {
+            for(String gam : newlist)
+            {
+                mPlayerList.add(new Player(Color.BLUE,gam));
+
+            }
+        }/*else if(newlist.isEmpty()==true)
+        {
+            mPlayerList.add(new Player(Color.BLUE,"misp"));
+        }*/
+        int indexx=0;
+
+        if(newwsp.isEmpty()==false)
+        {
+            for(Player pla : mPlayerList)
+            {
+                mLogic = new Logic((Activity) this.getContext());
+                mLogic.setPlayersOnStart(pla);
+
+                pla.getLine().mX=(float)newwsp.get(indexx);
+                pla.getLine().mY=(float)newwsp.get(indexx+1);
+                pla.getLine().mVel=(float)newwsp.get(indexx+2);
+                pla.getLine().mAngle=(float)newwsp.get(indexx+3);
+                indexx+=4;
+            }
+        }/*else if( newwsp.isEmpty()==true)
+        {
+            mLogic = new Logic((Activity) this.getContext());
+            mLogic.setPlayersOnStart(mPlayerList.get(0));
+        }*/
+
+    }
+
+    public List<Player> getList(){
+        return mPlayerList;
+    }
+    public boolean getStart(){
+        return mStart;
+    }
+
+    public Player getPlayers(){
+        return mPlayer;
     }
 
     public void Draw(Canvas c) {
