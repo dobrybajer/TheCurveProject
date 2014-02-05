@@ -1,4 +1,4 @@
-package com.example.thecurve;
+package com.student.thecurvegame;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -1,27 +1,22 @@
-package com.example.thecurve;
+package com.student.thecurvegame;
 
-/**
- * Created by Łukasz on 25.01.14.
- */
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
-
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
-
-
-
 import com.samsung.chord.ChordManager;
-import com.samsung.chord.IChordChannel;
 
+import com.samsung.chord.IChordChannel;
 import com.samsung.chord.IChordChannelListener;
 import com.samsung.chord.IChordManagerListener;
-
-import com.example.thecurve.Player;
+import com.student.thecurvegame.Models.ExtPoint;
+import com.student.thecurvegame.Models.Logic;
+import com.student.thecurvegame.Models.Player;
+import com.student.thecurvegame.Views.GameSurfaceView;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class Chord extends Activity{
 
@@ -40,6 +35,7 @@ public class Chord extends Activity{
     public String node=null;
 
     private LogActivity mlogact=null;
+    private GameSurfaceView gameSurfaceView=null;
 
     public Chord(Context mcontect,String _PlayerName,LogActivity _logact)
     {
@@ -50,22 +46,42 @@ public class Chord extends Activity{
         startChord();
     }
 
+
+
     private void startChord() {
 
         List<Integer> infList=mChordManager.getAvailableInterfaceTypes();
         if(infList.isEmpty())
         {
                 SetText("No Interace");
+
         }
 
-        int interfacetype=infList.get(0);
+        int interfacetype=0;
 
-        int nError=mChordManager.start(interfacetype,mManagerListener);
+        if(infList.isEmpty()==false)
+        {
+            interfacetype=infList.get(0);
+            int nError=mChordManager.start(interfacetype,mManagerListener);
+            if( nError != ChordManager.ERROR_NONE)
+            {
+                SetText("Chord Error");
+                mChordManager.close();
+            }
+
+
+        }else if(infList.isEmpty()==true)
+        {
+            mlogact.SetMessage();
+
+        }
+
+        /*int nError=mChordManager.start(interfacetype,mManagerListener);
         if( nError != ChordManager.ERROR_NONE)
         {
             SetText("Chord Error");
             mChordManager.close();
-        }
+        }*/
 
     }
 
@@ -76,7 +92,9 @@ public class Chord extends Activity{
             {
                 SetText("Player");
             }
+
             joinTestChannel();
+
         }
 
         @Override
@@ -95,9 +113,11 @@ public class Chord extends Activity{
         }
     };
 
-    private void joinTestChannel() {
+    public void joinTestChannel() {
         IChordChannel channel =null;
-        channel = mChordManager.joinChannel(CHORD_HELLO_TEST_CHANNEL,mChannelListener);
+
+            channel = mChordManager.joinChannel(CHORD_HELLO_TEST_CHANNEL,mChannelListener);
+
         if(channel == null)
         {
             SetText("NO Channel");
@@ -113,8 +133,8 @@ public class Chord extends Activity{
 
 
             names.add(PlayerName);
-            Player player1=new Player(Color.BLUE,PlayerName);
-            Logic logic = new Logic(getParent());
+            Player player1=new Player(Color.BLUE,PlayerName, Chord.this.context);
+            Logic logic = new Logic(Chord.this);
             logic.setPlayersOnStart(player1);
 
 
@@ -148,11 +168,6 @@ public class Chord extends Activity{
 
             String name = new String(payload[0]);
             names.add(name);
-            /*String WspX=new String(payload[1]);
-            String WspY=new String(payload[2]);
-
-            Integer wsp_x=new Integer(WspX);
-            Integer wsp_y=new Integer(WspY);*/
 
             mWspStart.add(new Integer(new String(payload[1])));
             mWspStart.add(new Integer(new String(payload[2])));
@@ -163,6 +178,13 @@ public class Chord extends Activity{
             if(payloadType.equals("START"))
             {
                 StartGame();
+            }
+
+            if(payloadType.equals("MOVE"))
+            {
+                ExtPoint mExtPoint= new ExtPoint(new Integer(new String(payload[0])),new Integer(new String(payload[1])),
+                        new Integer(new String(payload[2])),new Integer(new String(payload[3])));
+                gameSurfaceView.DrawLocal(mExtPoint);
             }
 
             SetText("Recived Data");
@@ -234,6 +256,8 @@ public class Chord extends Activity{
         }
     };
 
+
+
     private void initChord() {
         if(mChordManager==null)
         {
@@ -253,6 +277,7 @@ public class Chord extends Activity{
         return mWspStart;
     }
 
+
     public void StartGame()
     {
         mlogact.Start(names, mWspStart);
@@ -261,6 +286,18 @@ public class Chord extends Activity{
 
     public void SetText(String text)
     {
+        if(mlogact!=null)
         mlogact.SetText(text);
     }
+
+    public void StopChord()
+    {
+        mChordManager.close();
+    }
+
+    public void setGameSurfaceView(GameSurfaceView v)
+    {
+        gameSurfaceView=v;
+    }
+
 }

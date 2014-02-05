@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+<PreferenceCategory android:title="Controls" >
+    <SwitchPreference
+        android:key="prefSensorControl"
+        android:title="Use sensor to control your curve"
+        android:defaultValue="false" />
+    <Preference android:title="@string/prefs_accelerometer" >
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.student.thecurvegame"
+            android:targetClass="com.student.thecurvegame.Activities.CalibrationActivity"
+            />
+    </Preference>
+</PreferenceCategory>
+<PreferenceCategory android:title="Logic Settings" >
+    <ListPreference
+        android:key="prefAngle"
+        android:title="Define angle"
+        android:entries="@array/prefAngle"
+        android:entryValues="@array/prefAngleValues"
+        />
+    <ListPreference
+        android:key="prefSpeed"
+        android:title="Define speed"
+        android:entries="@array/prefSpeed"
+        android:entryValues="@array/prefSpeedValues"
+        />
+</PreferenceCategory>
+
+</PreferenceScreen>

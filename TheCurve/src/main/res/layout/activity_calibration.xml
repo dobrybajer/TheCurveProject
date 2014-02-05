@@ -1,0 +1,47 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:context=".CalibrationActivity"
+    tools:ignore="Orientation"
+    android:padding="30dp">
+
+    <LinearLayout
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+        android:orientation="vertical">
+        <ProgressBar
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+
+            style="?android:attr/progressBarStyleHorizontal"
+
+            android:id="@+id/progressBar"
+            android:layout_gravity="center"
+            android:max="3000"
+
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="20dp"/>
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:text="Tap the screen (hold the phone without moving)  and wait 3 seconds until progress bar above are loaded."/>
+
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:id="@+id/imageView"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:adjustViewBounds="false"
+            android:background="@drawable/ok"
+            android:visibility="invisible" />
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>

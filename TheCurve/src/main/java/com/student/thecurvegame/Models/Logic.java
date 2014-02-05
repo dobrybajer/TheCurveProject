@@ -1,8 +1,12 @@
-package com.example.thecurve;
+package com.student.thecurvegame.Models;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.Random;
@@ -10,9 +14,16 @@ import java.util.Random;
 public class Logic {
 
     private Activity mainActivity;
+    SharedPreferences sp;
+    boolean sensorControl;
+    private float mPrefVar;
+    private static final int touchLimit = 0;
 
-    public Logic(final Activity activity) {
+    public Logic( Activity activity) {
         this.mainActivity = activity;
+       /* sp = PreferenceManager.getDefaultSharedPreferences(activity);
+        sensorControl = sp.getBoolean("prefSensorControl", false);
+        mPrefVar = sp.getFloat("prefSensor", 0);*/
     }
 
     public void onCollideLine(Player player) {
@@ -32,8 +43,10 @@ public class Logic {
     }
 
     private void sendMessage() {
-        new Thread() {
-            public void run() {
+        new Thread()
+        {
+            public void run()
+            {
                 mainActivity.runOnUiThread(new Runnable() {
                     public void run() {
                         Toast.makeText(mainActivity, "Fuck off", Toast.LENGTH_SHORT).show();
@@ -43,28 +56,43 @@ public class Logic {
         }.start();
     }
 
-    public boolean movePlayer(Bitmap bitmap, Player player, float sensorY) {
-        if (player.isDead())
+    public boolean movePlayer(Bitmap bitmap, Player player, float deltaMovement) {
+        if (player.isDead()){
             return false;
+        }
 
         Line l = player.getLine();
+        if(sensorControl)
+        {
+            float limitDown = -1;//+mPrefVar;
+            float limitUp = 1;//+mPrefVar;
 
-        if (sensorY < -2)
-            l.turnLeft();
-        if (sensorY > 2)
-            l.turnRight();
+            if (deltaMovement<limitDown)
+                l.turnLeft();
+            if (deltaMovement>limitUp)
+                l.turnRight();
+        }
+        else
+        {
+            if (deltaMovement<touchLimit)
+                l.turnLeft();
+            if (deltaMovement>touchLimit)
+                l.turnRight();
+        }
+
 
         float ex = (float) (Math.cos(l.mAngle) * l.mVel);
         float ey = (float) (Math.sin(l.mAngle) * l.mVel);
         float x = l.mX + ex;
         float y = l.mY + ey;
-
         if (x <= 0 || x >= bitmap.getWidth() || y <= 0 || y >= bitmap.getHeight()) {
+
             this.onCollideWall(player);
             return false;
         }
 
-        if (bitmap.getPixel((int) x, (int) y) != Color.TRANSPARENT) {
+        if(bitmap.getPixel((int)x,(int)y)!=Color.TRANSPARENT)
+        {
             this.onCollideLine(player);
             return false;
         }
@@ -92,7 +120,8 @@ public class Logic {
 
     private int randomColor() {
         int color = new Random().nextInt(7);
-        switch (color) {
+        switch(color)
+        {
             case 0:
                 return Color.RED;
             case 1:

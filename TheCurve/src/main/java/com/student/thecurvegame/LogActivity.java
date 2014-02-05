@@ -1,14 +1,18 @@
-package com.example.thecurve;
+package com.student.thecurvegame;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
 import android.os.Parcelable;
+import android.os.PowerManager;
 import android.view.View;
 
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -21,7 +25,9 @@ import com.samsung.chord.IChordChannel;
 import com.samsung.chord.IChordChannelListener;
 import com.samsung.chord.IChordManagerListener;
 
-import com.example.thecurve.Player;
+import com.student.thecurvegame.Activities.GameActivity;
+import com.student.thecurvegame.Models.Player;
+import com.student.thecurvegame.Views.GameSurfaceView;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -41,9 +47,19 @@ public class LogActivity extends Activity {
     private ArrayList<String> names=new ArrayList<String>();
     private ArrayList<Integer> mWspStart=new ArrayList<Integer>();
 
+    private PowerManager.WakeLock mWakeLock;
+    private GameSurfaceView mGameSurfaceView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        PowerManager mPowerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        mWakeLock = mPowerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, getClass().getName());
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
         setContentView(R.layout.activity_log);
 
         btn_game = (Button) findViewById(R.id.button_game);
@@ -54,6 +70,9 @@ public class LogActivity extends Activity {
         TextView tex =(TextView)findViewById(R.id.text);
         tex.setText("@string/connect");
 
+        mGameSurfaceView = new GameSurfaceView(this);
+
+
 
 
     }
@@ -63,26 +82,29 @@ public class LogActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.button_game:
-                    if(mChord!=null)
+                    if(mChord!=null )
                     {
                         names=mChord.getArrayName();
                         mWspStart=mChord.getArrayWsp();
+                        try {
                         mChord.channel.sendData(mChord.node, "START", null);
+                        }
+                        catch(Exception e)
+                        {
+                            //Start(names,mWspStart);
+                        }
                     }
 
 
-                   /* Intent intent = new Intent(LogActivity.this,GameActivity.class);
-                    intent.putStringArrayListExtra("test", names);
-                    intent.putIntegerArrayListExtra("startwsp", mWspStart);
-                    startActivity(intent);*/
                     Start(names,mWspStart);
 
                     break;
                 case R.id.button_chord:
-                   // SetText("Start Chord");
+
                      EditText text =(EditText)findViewById(R.id.player_name);
                      PlayerName = text.getText().toString();
                      mChord=new Chord(getApplicationContext(),PlayerName,LogActivity.this);
+
 
                     break;
 
@@ -92,27 +114,46 @@ public class LogActivity extends Activity {
 
     public void Start(ArrayList<String> _names,ArrayList<Integer> _Wsp)
     {
-            try {
-            Intent intent = new Intent(this,GameActivity.class);
-            Message message=new Message(_names,_Wsp);
 
-            intent.putExtra("Message", message);
-            startActivity(intent);
-            }
-            catch(Exception e)
-           {
-             SetText("Intent Error");
 
-            }
+            mGameSurfaceView = new GameSurfaceView(this);
+            mGameSurfaceView.setPlayerList(names,_Wsp);
+            if(mChord !=null)
+            mChord.setGameSurfaceView(mGameSurfaceView);
+            mGameSurfaceView.startGame();
+            mGameSurfaceView.setChord(mChord);
+
+            setContentView(mGameSurfaceView);
+
     }
 
     public void SetText(String Text)
     {
-        TextView tex =(TextView)findViewById(R.id.text);
-        tex.setText(Text);
+      /*  TextView tex =(TextView)findViewById(R.id.text);
+        tex.setText(Text);*/
     }
 
+   /* @Override
+    protected void onResume() {
+        super.onResume();
+        mWakeLock.acquire();
+        mGameSurfaceView.startGame();
+    }*/
 
+  /*  @Override
+    protected void onPause() {
+        super.onPause();
+        mGameSurfaceView.stopGame();
+        mWakeLock.release();
+    }*/
+
+    public void SetMessage()
+    {
+        AlertDialog alertDialog= new AlertDialog.Builder(this).create();
+        alertDialog.setTitle("NO WI-FI CHANNEL");
+        alertDialog.setMessage("turn on wi-i mode ");
+        alertDialog.show();
+    }
 }
 
 

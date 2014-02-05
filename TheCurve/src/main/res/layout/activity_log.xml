@@ -5,22 +5,31 @@
     android:layout_height="match_parent"
     tools:context=".LogActivity"
     tools:ignore="MergeRootFrame"
+
     android:background="@drawable/background">
 
 
-     <Button
+    <LinearLayout
+        android:id="@+id/button_layout"
+        android:layout_height="135dp"
+        android:layout_width="200dp"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="175dp"
+        android:orientation="vertical">
+        <Button
             android:id="@+id/button_game"
-            android:layout_height="75dp"
+            android:layout_height="fill_parent"
             android:layout_width="fill_parent"
             android:layout_weight="1"
-            android:text="@string/button_game" />
-    <Button
-        android:id="@+id/button_chord"
-        android:layout_height="75dp"
-        android:layout_width="fill_parent"
-        android:layout_weight="1"
-        android:layout_marginTop="75dp"
-        android:text="@string/button_chord"/>
+            android:text="@string/button_game"/>
+        <Button
+            android:id="@+id/button_chord"
+            android:layout_height="fill_parent"
+            android:layout_width="fill_parent"
+            android:text="@string/button_chord"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/text"
