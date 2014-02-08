@@ -9,6 +9,8 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.student.thecurvegame.Chord;
+
 import java.util.Random;
 
 public class Logic {
@@ -18,12 +20,17 @@ public class Logic {
     boolean sensorControl;
     private float mPrefVar;
     private static final int touchLimit = 0;
+    private Chord mChord=null;
 
     public Logic( Activity activity) {
         this.mainActivity = activity;
-       /* sp = PreferenceManager.getDefaultSharedPreferences(activity);
+        sp = PreferenceManager.getDefaultSharedPreferences(activity);
         sensorControl = sp.getBoolean("prefSensorControl", false);
-        mPrefVar = sp.getFloat("prefSensor", 0);*/
+        mPrefVar = sp.getFloat("prefSensor", 0);
+    }
+    public void setmChord(Chord chord)
+    {
+        mChord=chord;
     }
 
     public void onCollideLine(Player player) {
@@ -37,6 +44,8 @@ public class Logic {
     }
 
     public void onPlayerIsDead(Player player) {
+        if(mChord!=null && mChord.mCount>1)
+            mChord.channel.sendData(mChord.node, "DEAD", null);
         sendMessage();
         if (isRoundEnded())
             onRoundEnded();

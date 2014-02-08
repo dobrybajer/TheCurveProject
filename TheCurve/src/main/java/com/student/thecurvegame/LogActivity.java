@@ -2,6 +2,7 @@ package com.student.thecurvegame;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 
 
@@ -15,8 +16,9 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-
+import android.widget.Toast;
 
 
 import com.samsung.chord.ChordManager;
@@ -43,10 +45,9 @@ public class LogActivity extends Activity {
     private LogActivity logact=null;
     private Chord mChord=null;
 
-    private String PlayerName;
-    private ArrayList<String> names=new ArrayList<String>();
-    private ArrayList<Integer> mWspStart=new ArrayList<Integer>();
+    private String PlayerName="Player";
 
+    private int mPlayerCount=0;
     private PowerManager.WakeLock mWakeLock;
     private GameSurfaceView mGameSurfaceView;
 
@@ -66,14 +67,7 @@ public class LogActivity extends Activity {
         btn_chord = (Button) findViewById(R.id.button_chord);
         btn_game.setOnClickListener(onClickListener);
         btn_chord.setOnClickListener(onClickListener);
-
-        TextView tex =(TextView)findViewById(R.id.text);
-        tex.setText("@string/connect");
-
-        mGameSurfaceView = new GameSurfaceView(this);
-
-
-
+        GetName();
 
     }
 
@@ -84,53 +78,53 @@ public class LogActivity extends Activity {
                 case R.id.button_game:
                     if(mChord!=null )
                     {
-                        names=mChord.getArrayName();
-                        mWspStart=mChord.getArrayWsp();
+
+                        mPlayerCount=mChord.getCount();
                         try {
                         mChord.channel.sendData(mChord.node, "START", null);
                         }
                         catch(Exception e)
                         {
-                            //Start(names,mWspStart);
+
                         }
                     }
 
 
-                    Start(names,mWspStart);
+                    Start(mPlayerCount);
 
                     break;
                 case R.id.button_chord:
 
-                     EditText text =(EditText)findViewById(R.id.player_name);
-                     PlayerName = text.getText().toString();
-                     mChord=new Chord(getApplicationContext(),PlayerName,LogActivity.this);
-
-
+                     mChord=new Chord(getApplicationContext(),LogActivity.this);
                     break;
 
             }
         }
     };
 
-    public void Start(ArrayList<String> _names,ArrayList<Integer> _Wsp)
+    public void Start(int count)
     {
 
 
             mGameSurfaceView = new GameSurfaceView(this);
-            mGameSurfaceView.setPlayerList(names,_Wsp);
+            //mGameSurfaceView.setPlayerList(_names,_Wsp);
+           // mGameSurfaceView.setCount(count);
             if(mChord !=null)
             mChord.setGameSurfaceView(mGameSurfaceView);
-            mGameSurfaceView.startGame();
+            //mGameSurfaceView.startGame();
             mGameSurfaceView.setChord(mChord);
-
+            mGameSurfaceView.setCount(count);
+            mGameSurfaceView.setPlayer(PlayerName);
+            mGameSurfaceView.startGame();
             setContentView(mGameSurfaceView);
 
     }
 
+
     public void SetText(String Text)
     {
-      /*  TextView tex =(TextView)findViewById(R.id.text);
-        tex.setText(Text);*/
+        Button tex =(Button)findViewById(R.id.button_chord);
+        tex.setText(Text);
     }
 
    /* @Override
@@ -140,12 +134,14 @@ public class LogActivity extends Activity {
         mGameSurfaceView.startGame();
     }*/
 
-  /*  @Override
+    @Override
     protected void onPause() {
         super.onPause();
-        mGameSurfaceView.stopGame();
-        mWakeLock.release();
-    }*/
+        if(mChord!=null)
+        mChord.mChordManager.stop();
+        /*mGameSurfaceView.stopGame();
+        mWakeLock.release();*/
+    }
 
     public void SetMessage()
     {
@@ -154,6 +150,43 @@ public class LogActivity extends Activity {
         alertDialog.setMessage("turn on wi-i mode ");
         alertDialog.show();
     }
+
+    public void GetName()
+    {
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(LogActivity.this);
+
+        // Setting Dialog Title
+        alertDialog.setTitle("Name");
+
+        // Setting Dialog Message
+        alertDialog.setMessage("Enter Name");
+        final EditText input = new EditText(LogActivity.this);
+        input.setText("Player");
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        input.setLayoutParams(lp);
+        alertDialog.setView(input);
+
+
+        // Setting Icon to Dialog
+
+
+        // Setting Positive "Yes" Button
+        alertDialog.setPositiveButton("OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int which) {
+                        // Write your code here to execute after dialog
+
+                        PlayerName = input.getText().toString();
+                    }
+                    });
+
+
+        alertDialog.show();
+
+    }
+
 }
 
 

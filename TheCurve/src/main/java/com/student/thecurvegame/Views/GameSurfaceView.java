@@ -1,6 +1,7 @@
 package com.student.thecurvegame.Views;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -24,6 +25,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.student.thecurvegame.Chord;
 import com.student.thecurvegame.Controllers.GameAsyncTask;
@@ -61,8 +63,10 @@ public class GameSurfaceView extends SurfaceView implements SensorEventListener 
     private Logic mLogic;
     private float mTurnVar;
     private float mCalibratedSensor;
-    public List<Player> mPlayerList=new ArrayList<Player>();
+
     private boolean mStart;
+
+    public int mPlayerCount=0;
 
     private Chord mChord=null;
 
@@ -90,39 +94,53 @@ public class GameSurfaceView extends SurfaceView implements SensorEventListener 
         mainCanvas = new Canvas(mBitmapPoint);
         mainCanvas.drawColor(Color.TRANSPARENT);
 
+        mLogic = new Logic((Activity) this.getContext());
+
         mStart=true;
     }
 
     public float getLineX()
     {
-        return mPlayerList.get(0).getLine().mX;
+        return mPlayer.getLine().mX;
     }
 
     public float getLineY()
     {
-        return mPlayerList.get(0).getLine().mY;
+        return mPlayer.getLine().mY;
     }
 
     public boolean Compute() {
 
-            mPlayer=mPlayerList.get(0);
             return mLogic.movePlayer(mBitmapPoint, mPlayer, mTurnVar);
 
     }
 
     public void DrawLocal(ExtPoint p) {
 
-            mPlayer=mPlayerList.get(0);
+        linePaint = new Paint();
+        linePaint.setAntiAlias(true);
+        linePaint.setStrokeWidth(mPlayer.getLine().mSize);
+        linePaint.setColor(mPlayer.getColor());
+
             mainCanvas.drawLine(p.oldX,  p.oldY,  p.newX,  p.newY, linePaint);
-            if(mPlayerList.size()!=1)
+            if(mPlayerCount>1 && running)
             SendPoint(p);
 
     }
 
+    public void DrawLocalPlayers(ExtPoint p, int color)
+    {
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setStrokeWidth(mPlayer.getLine().mSize);
+        paint.setColor(color);
+        mainCanvas.drawLine(p.oldX,  p.oldY,  p.newX,  p.newY, paint);
+       // mainCanvas.drawLine(p.oldX+1,  p.oldY+1,  p.newX+1,  p.newY+1, paint);
+        mainCanvas.drawLine(p.oldX-1,  p.oldY-1,  p.newX-1,  p.newY-1, paint);
+    }
+
     public void Draw() {
-        for(int index=0;index<1;index++)
-        {
-            mPlayer=mPlayerList.get(index);
+
             Canvas c=null;
             if (!mPlayer.isDead() && running) {
                 if(surfaceHolder.getSurface().isValid()){
@@ -140,7 +158,7 @@ public class GameSurfaceView extends SurfaceView implements SensorEventListener 
                     }
                 }
             }
-        }
+
     }
 
     public void startGame() {
@@ -196,62 +214,44 @@ public class GameSurfaceView extends SurfaceView implements SensorEventListener 
         return false;
     }
 
-    public void setPlayerList(ArrayList<String> newlist,ArrayList<Integer> newwsp)
+    public void setCount(int count)
     {
-        if(newlist.isEmpty()==false)
+        mPlayerCount=count;
+    }
+
+    public void PlayerDead()
+    {
+        mPlayerCount--;
+        if(mPlayerCount==1)
         {
-            for(String gam : newlist)
+            stopGame();
+            new Thread()
             {
-                mPlayerList.add(new Player(Color.BLUE,gam, getContext()));
-
-            }
-        }else if(newlist.isEmpty()==true)
-        {
-            mPlayerList.add(new Player(Color.BLUE,"misp", getContext()));
+                public void run()
+                {
+                    final Activity  mainActivity=(Activity)getContext();
+                    mainActivity.runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(mainActivity, mPlayer.getName()+" Win!!!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }.start();
         }
-        int indexx=0;
-
-        if(newwsp.isEmpty()==false)
-        {
-            for(Player pla : mPlayerList)
-            {
-                mLogic = new Logic((Activity) this.getContext());
-                mLogic.setPlayersOnStart(pla);
-
-                pla.getLine().mX=(float)newwsp.get(indexx);
-                pla.getLine().mY=(float)newwsp.get(indexx+1);
-                pla.getLine().mVel=(float)newwsp.get(indexx+2);
-                pla.getLine().mAngle=(float)newwsp.get(indexx+3);
-                indexx+=4;
-                linePaint = new Paint();
-                linePaint.setAntiAlias(true);
-                linePaint.setStrokeWidth(pla.getLine().mSize);
-                linePaint.setColor(pla.getColor());
-            }
-        }else if( newwsp.isEmpty()==true)
-        {
-            mLogic = new Logic((Activity) this.getContext());
-            mLogic.setPlayersOnStart(mPlayerList.get(0));
-            linePaint = new Paint();
-            linePaint.setAntiAlias(true);
-            linePaint.setStrokeWidth(mPlayerList.get(0).getLine().mSize);
-            linePaint.setColor(mPlayerList.get(0).getColor());
-        }
-
-
 
     }
 
     public void SendPoint(ExtPoint p)
     {
-        byte[][] payload = new byte[4][];
+        byte[][] payload = new byte[5][];
 
         Integer[] point=new Integer[]{(int)p.oldX,(int)p.oldY,(int)p.newX,(int)p.newY};
-
+        Integer color = new Integer(mPlayer.getColor());
         payload[0]=point[0].toString().getBytes();
         payload[1]=point[1].toString().getBytes();
         payload[2]=point[2].toString().getBytes();
         payload[3]=point[3].toString().getBytes();
+        payload[4]=color.toString().getBytes();
 
         mChord.channel.sendData(mChord.node, "MOVE", payload);
     }
@@ -259,5 +259,13 @@ public class GameSurfaceView extends SurfaceView implements SensorEventListener 
     public void setChord(Chord _Chord)
     {
         mChord=_Chord;
+       mLogic.setmChord( _Chord );
+    }
+
+    public void setPlayer(String name)
+    {
+        mPlayer=new Player(Color.BLUE,name, getContext());
+        mLogic.setPlayersOnStart(mPlayer);
+        mLogic.setmChord(mChord);
     }
 }

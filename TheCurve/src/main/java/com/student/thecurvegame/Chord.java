@@ -20,10 +20,8 @@ import java.util.List;
 
 public class Chord extends Activity{
 
-    private ChordManager mChordManager =null;
+    public ChordManager mChordManager =null;
     private String PlayerName;
-    private ArrayList<String> names=new ArrayList<String>();
-    private ArrayList<Integer> mWspStart=new ArrayList<Integer>();
 
     private Context context=null;
 
@@ -31,16 +29,18 @@ public class Chord extends Activity{
 
     private static final String CHORD_SAMPLE_MESSAGE_TYPE = "com.samsung.android.sdk.chord.example.MESSAGE_TYPE";
 
+
+    public int mCount=1;
     public IChordChannel channel=null;
     public String node=null;
 
     private LogActivity mlogact=null;
     private GameSurfaceView gameSurfaceView=null;
 
-    public Chord(Context mcontect,String _PlayerName,LogActivity _logact)
+    public Chord(Context mcontect,LogActivity _logact)
     {
         mlogact=_logact;
-        PlayerName=_PlayerName;
+
         context=mcontect;
         initChord();
         startChord();
@@ -76,13 +76,6 @@ public class Chord extends Activity{
 
         }
 
-        /*int nError=mChordManager.start(interfacetype,mManagerListener);
-        if( nError != ChordManager.ERROR_NONE)
-        {
-            SetText("Chord Error");
-            mChordManager.close();
-        }*/
-
     }
 
     IChordManagerListener mManagerListener = new IChordManagerListener() {
@@ -90,7 +83,7 @@ public class Chord extends Activity{
         public void onStarted(String nodeName, int reason) {
             if(reason == STARTED_BY_USER)
             {
-                SetText("Player");
+                SetText("Connected to WI-FI");
             }
 
             joinTestChannel();
@@ -99,7 +92,7 @@ public class Chord extends Activity{
 
         @Override
         public void onNetworkDisconnected() {
-
+            mChordManager.stop();
         }
 
         @Override
@@ -129,35 +122,17 @@ public class Chord extends Activity{
         public void onNodeJoined(String fromNode, String fromChannel) {
             byte[][] payload = new byte[6][];
 
-            payload[0]=PlayerName.getBytes();
-
-
-            names.add(PlayerName);
-            Player player1=new Player(Color.BLUE,PlayerName, Chord.this.context);
-            Logic logic = new Logic(Chord.this);
-            logic.setPlayersOnStart(player1);
-
-
-            mWspStart.add(new Integer((int)player1.getLine().mX));
-            mWspStart.add(new Integer((int)player1.getLine().mY));
-            mWspStart.add(new Integer((int)player1.getLine().mVel));
-            mWspStart.add(new Integer((int)player1.getLine().mAngle));
-
-            payload[1]=mWspStart.get(0).toString().getBytes();
-            payload[2]=mWspStart.get(1).toString().getBytes();
-            payload[3]=mWspStart.get(2).toString().getBytes();
-            payload[4]=mWspStart.get(3).toString().getBytes();
-
 
             node=fromNode;
             channel = mChordManager.getJoinedChannel(fromChannel);
             channel.sendData(fromNode, CHORD_SAMPLE_MESSAGE_TYPE, payload);
+
             SetText("Send Data");
         }
 
         @Override
         public void onNodeLeft(String s, String s2) {
-            SetText("Left Player");
+            //SetText("Left Player");
         }
 
         @Override
@@ -165,15 +140,7 @@ public class Chord extends Activity{
                                    byte[][] payload) {
             if(payloadType.equals(CHORD_SAMPLE_MESSAGE_TYPE)){
 
-
-            String name = new String(payload[0]);
-            names.add(name);
-
-            mWspStart.add(new Integer(new String(payload[1])));
-            mWspStart.add(new Integer(new String(payload[2])));
-            mWspStart.add(new Integer(new String(payload[3])));
-            mWspStart.add(new Integer(new String(payload[4])));
-
+            mCount++;
             }
             if(payloadType.equals("START"))
             {
@@ -184,10 +151,16 @@ public class Chord extends Activity{
             {
                 ExtPoint mExtPoint= new ExtPoint(new Integer(new String(payload[0])),new Integer(new String(payload[1])),
                         new Integer(new String(payload[2])),new Integer(new String(payload[3])));
-                gameSurfaceView.DrawLocal(mExtPoint);
+                Integer color = new Integer(new String(payload[4]));
+                gameSurfaceView.DrawLocalPlayers(mExtPoint,color);
             }
 
-            SetText("Recived Data");
+            if(payloadType.equals("DEAD"))
+            {
+                gameSurfaceView.PlayerDead();
+            }
+
+           // SetText("Recived Data");
         }
 
         @Override
@@ -267,20 +240,17 @@ public class Chord extends Activity{
 
         }
     }
-    public ArrayList<String> getArrayName()
-    {
-        return names;
-    }
 
-    public ArrayList<Integer> getArrayWsp()
-    {
-        return mWspStart;
-    }
 
+    public int getCount()
+    {
+        return mCount;
+    }
 
     public void StartGame()
     {
-        mlogact.Start(names, mWspStart);
+        mlogact.Start(mCount);
+
 
     }
 

@@ -36,7 +36,7 @@ public class GameActivity extends Activity {
 
 
         mGameSurfaceView = new GameSurfaceView(this);
-        mGameSurfaceView.setPlayerList(message.getNames(),message.getWsp());
+        //mGameSurfaceView.setPlayerList(message.getNames(),message.getWsp());
 
         setContentView(mGameSurfaceView);
     }
