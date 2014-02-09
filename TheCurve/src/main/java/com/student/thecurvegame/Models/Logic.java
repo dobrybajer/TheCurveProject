@@ -45,7 +45,12 @@ public class Logic {
 
     public void onPlayerIsDead(Player player) {
         if(mChord!=null && mChord.mCount>1)
-            mChord.channel.sendData(mChord.node, "DEAD", null);
+        {
+            for(String n:mChord.nodes)
+            {
+                mChord.channel.sendData(n, "DEAD", null);
+            }
+        }
         sendMessage();
         if (isRoundEnded())
             onRoundEnded();

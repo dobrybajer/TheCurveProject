@@ -81,7 +81,10 @@ public class LogActivity extends Activity {
 
                         mPlayerCount=mChord.getCount();
                         try {
-                        mChord.channel.sendData(mChord.node, "START", null);
+                            for(String n:mChord.nodes)
+                            {
+                              mChord.channel.sendData(n, "START", null);
+                            }
                         }
                         catch(Exception e)
                         {

@@ -225,7 +225,7 @@ public class GameSurfaceView extends SurfaceView implements SensorEventListener 
         if(mPlayerCount==1)
         {
             stopGame();
-            new Thread()
+           /* new Thread()
             {
                 public void run()
                 {
@@ -236,7 +236,7 @@ public class GameSurfaceView extends SurfaceView implements SensorEventListener 
                         }
                     });
                 }
-            }.start();
+            }.start();*/
         }
 
     }
@@ -253,7 +253,10 @@ public class GameSurfaceView extends SurfaceView implements SensorEventListener 
         payload[3]=point[3].toString().getBytes();
         payload[4]=color.toString().getBytes();
 
-        mChord.channel.sendData(mChord.node, "MOVE", payload);
+        for(String n:mChord.nodes)
+        {
+         mChord.channel.sendData(n, "MOVE", payload);
+        }
     }
 
     public void setChord(Chord _Chord)

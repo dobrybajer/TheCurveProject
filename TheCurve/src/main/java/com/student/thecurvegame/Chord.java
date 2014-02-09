@@ -34,6 +34,7 @@ public class Chord extends Activity{
     public IChordChannel channel=null;
     public String node=null;
 
+    public ArrayList<String> nodes = new ArrayList<String>();
     private LogActivity mlogact=null;
     private GameSurfaceView gameSurfaceView=null;
 
@@ -120,14 +121,15 @@ public class Chord extends Activity{
     public IChordChannelListener mChannelListener= new IChordChannelListener() {
         @Override
         public void onNodeJoined(String fromNode, String fromChannel) {
-            byte[][] payload = new byte[6][];
+            byte[][] payload = new byte[1][];
 
 
             node=fromNode;
+            nodes.add(node);//przeszukiwanie
             channel = mChordManager.getJoinedChannel(fromChannel);
             channel.sendData(fromNode, CHORD_SAMPLE_MESSAGE_TYPE, payload);
 
-            SetText("Send Data");
+           // SetText("Send Data");
         }
 
         @Override
@@ -265,6 +267,10 @@ public class Chord extends Activity{
         mChordManager.close();
     }
 
+    public ArrayList<String> getNode()
+    {
+        return nodes;
+    }
     public void setGameSurfaceView(GameSurfaceView v)
     {
         gameSurfaceView=v;
