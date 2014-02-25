@@ -8,8 +8,7 @@ public class ExtPoint extends Point {
     public float newX;
     public float newY;
 
-    public ExtPoint(float oX, float oY,float nX,float nY)
-    {
+    public ExtPoint(float oX, float oY, float nX, float nY) {
         oldX = oX;
         oldY = oY;
         newX = nX;

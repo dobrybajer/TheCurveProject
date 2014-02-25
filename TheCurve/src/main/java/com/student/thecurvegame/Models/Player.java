@@ -9,8 +9,7 @@ public class Player {
     private Line mLine;
     private int mPoints;
 
-    public Player(int color, String name, Context con)
-    {
+    public Player(int color, String name, Context con) {
         this.mColor = color;
         this.mName = name;
         this.mDead = false;
@@ -41,7 +40,9 @@ public class Player {
         this.mColor = color;
     }
 
-    public String getName() { return mName; }
+    public String getName() {
+        return mName;
+    }
 
     public Line getLine() {
         return mLine;

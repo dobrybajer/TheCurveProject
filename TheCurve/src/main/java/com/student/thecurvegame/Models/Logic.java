@@ -1,36 +1,32 @@
 package com.student.thecurvegame.Models;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.Toast;
-
-import com.student.thecurvegame.Chord;
 
 import java.util.Random;
 
 public class Logic {
 
-    private Activity mainActivity;
+    Activity mainActivity;
     SharedPreferences sp;
     boolean sensorControl;
-    private float mPrefVar;
-    private static final int touchLimit = 0;
-    private Chord mChord=null;
+    float mPrefVar;
+    static final int touchLimit = 0;
+    Chord mChord = null;
 
-    public Logic( Activity activity) {
+    public Logic(Activity activity) {
         this.mainActivity = activity;
         sp = PreferenceManager.getDefaultSharedPreferences(activity);
         sensorControl = sp.getBoolean("prefSensorControl", false);
         mPrefVar = sp.getFloat("prefSensor", 0);
     }
-    public void setmChord(Chord chord)
-    {
-        mChord=chord;
+
+    public void setmChord(Chord chord) {
+        mChord = chord;
     }
 
     public void onCollideLine(Player player) {
@@ -44,26 +40,21 @@ public class Logic {
     }
 
     public void onPlayerIsDead(Player player) {
-        if(mChord!=null && mChord.mCount>1)
-        {
-            for(String n:mChord.nodes)
-            {
+        if (mChord != null && mChord.mCount > 1) {
+            for (String n : mChord.nodes) {
                 mChord.channel.sendData(n, "DEAD", null);
             }
         }
-        sendMessage();
-        if (isRoundEnded())
-            onRoundEnded();
+        sendMessage(player);
     }
 
-    private void sendMessage() {
-        new Thread()
-        {
-            public void run()
-            {
+    private void sendMessage(Player player) {
+        final String name = player.getName();
+        new Thread() {
+            public void run() {
                 mainActivity.runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(mainActivity, "Fuck off", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mainActivity, name + "You lose", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -71,42 +62,37 @@ public class Logic {
     }
 
     public boolean movePlayer(Bitmap bitmap, Player player, float deltaMovement) {
-        if (player.isDead()){
+        if (player.isDead()) {
             return false;
         }
 
         Line l = player.getLine();
-        if(sensorControl)
-        {
-            float limitDown = -1;//+mPrefVar;
-            float limitUp = 1;//+mPrefVar;
+        if (sensorControl) {
+            float limitDown = -1;
+            float limitUp = 1;
 
-            if (deltaMovement<limitDown)
+            if (deltaMovement < limitDown)
                 l.turnLeft();
-            if (deltaMovement>limitUp)
+            if (deltaMovement > limitUp)
+                l.turnRight();
+        } else {
+            if (deltaMovement < touchLimit)
+                l.turnLeft();
+            if (deltaMovement > touchLimit)
                 l.turnRight();
         }
-        else
-        {
-            if (deltaMovement<touchLimit)
-                l.turnLeft();
-            if (deltaMovement>touchLimit)
-                l.turnRight();
-        }
-
 
         float ex = (float) (Math.cos(l.mAngle) * l.mVel);
         float ey = (float) (Math.sin(l.mAngle) * l.mVel);
         float x = l.mX + ex;
         float y = l.mY + ey;
-        if (x <= 0 || x >= bitmap.getWidth() || y <= 0 || y >= bitmap.getHeight()) {
 
+        if (x <= 0 || x >= bitmap.getWidth() || y <= 0 || y >= bitmap.getHeight()) {
             this.onCollideWall(player);
             return false;
         }
 
-        if(bitmap.getPixel((int)x,(int)y)!=Color.TRANSPARENT)
-        {
+        if (bitmap.getPixel((int) x, (int) y) != Color.TRANSPARENT) {
             this.onCollideLine(player);
             return false;
         }
@@ -116,26 +102,9 @@ public class Logic {
         return true;
     }
 
-    public boolean isRoundEnded() {
-        int notDeadPlayers = 1;
-
-        /*Player[] player = Spiel.CURRENT_SPIEL.getSpieler();
-        for (Spieler s : spieler) {
-            if (!s.isTot())
-                anzahlLebende += 1;
-        }*/
-        return notDeadPlayers <= 1;
-    }
-
-    private void onRoundEnded() {
-        //Spiel.CURRENT_SPIEL.stopRunde();
-        //Spiel.CURRENT_SPIEL.setAwaitRunde(true);
-    }
-
     private int randomColor() {
         int color = new Random().nextInt(7);
-        switch(color)
-        {
+        switch (color) {
             case 0:
                 return Color.RED;
             case 1:
@@ -157,10 +126,13 @@ public class Logic {
         }
     }
 
-    public void setPlayersOnStart(Player player) {
+    public void setPlayersOnStart(Player player, int w, int h) {
         Line l = player.getLine();
-        l.mX = (float) (Math.random() * (300 - 100) + 50);
-        l.mY = (float) (Math.random() * (300 - 100) + 50);
+        int w_max = w - 50;
+        int h_max = h - 50;
+        int min = 50;
+        l.mX = (float) (Math.random() * (w_max - min) + min);
+        l.mY = (float) (Math.random() * (h_max - min) + min);
         l.mVel = 2;
         l.mAngle = (float) (Math.random() * 360);
         l.mSize = 8;

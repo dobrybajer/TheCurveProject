@@ -13,17 +13,11 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.Display;
-import android.view.Gravity;
 import android.view.MotionEvent;
-import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.student.thecurvegame.R;
 
@@ -35,7 +29,7 @@ public class CalibrationActivity extends Activity implements SensorEventListener
 
     private int count = 0;
     private long startTime = 0;
-    private float mSensor, mCalibVar=0;
+    private float mSensor, mCalibVar = 0;
 
 
     private SharedPreferences sp;
@@ -56,9 +50,9 @@ public class CalibrationActivity extends Activity implements SensorEventListener
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         sp = PreferenceManager.getDefaultSharedPreferences(this);
-        progressBar = (ProgressBar)findViewById(R.id.progressBar);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         timerHandler = new Handler();
-        imageView = (ImageView)findViewById(R.id.imageView);
+        imageView = (ImageView) findViewById(R.id.imageView);
     }
 
     private Runnable timerRunnable = new Runnable() {
@@ -66,24 +60,19 @@ public class CalibrationActivity extends Activity implements SensorEventListener
         public void run() {
             long millis = System.currentTimeMillis() - startTime;
 
-            if(millis<3100)
-            {
+            if (millis < 3100) {
                 count++;
-                mCalibVar=mCalibVar+mSensor;
+                mCalibVar = mCalibVar + mSensor;
                 Calculate(millis);
-            }
-            else if(millis==3100)
-            {
+            } else if (millis == 3100) {
                 imageView.setVisibility(View.VISIBLE);
-            }
-            else
-            {
+            } else {
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                mCalibVar/=count;
+                mCalibVar /= count;
 
                 SharedPreferences.Editor editor = sp.edit();
                 editor.putFloat("prefSensor", mCalibVar);
@@ -95,29 +84,24 @@ public class CalibrationActivity extends Activity implements SensorEventListener
         }
     };
 
-    public void Calculate(long promiles)
-    {
+    public void Calculate(long promiles) {
         Resources res = getResources();
         Rect bounds = progressBar.getProgressDrawable().getBounds();
 
-        if(promiles >= 1500)
-        {
+        if (promiles >= 1500) {
             progressBar.setProgressDrawable(res.getDrawable(R.drawable.greenprogressbar));
-        }
-        else
-        {
+        } else {
             progressBar.setProgressDrawable(res.getDrawable(R.drawable.redprogressbar));
         }
         progressBar.getProgressDrawable().setBounds(bounds);
-        progressBar.setProgress((int)promiles);
+        progressBar.setProgress((int) promiles);
     }
 
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         sensorEventListener = this;
-        if(event.getAction() == MotionEvent.ACTION_DOWN)
-        {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
             progressBar.setVisibility(View.VISIBLE);
             mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
             startTime = System.currentTimeMillis();
@@ -140,8 +124,7 @@ public class CalibrationActivity extends Activity implements SensorEventListener
     }
 
     @Override
-    protected void onDestroy()
-    {
+    protected void onDestroy() {
         super.onDestroy();
         mSensorManager.unregisterListener(sensorEventListener);
         mSensorManager = null;

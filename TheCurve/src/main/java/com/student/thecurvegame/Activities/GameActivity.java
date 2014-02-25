@@ -2,14 +2,12 @@ package com.student.thecurvegame.Activities;
 
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.view.WindowManager;
 
-import com.student.thecurvegame.Message;
 import com.student.thecurvegame.Views.GameSurfaceView;
 
 public class GameActivity extends Activity {
@@ -27,12 +25,6 @@ public class GameActivity extends Activity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         Intent intent = getIntent();
-
-        Message message=null;
-        if(intent.getParcelableExtra("Message") != null)
-        {
-            message=intent.getParcelableExtra("Message");
-        }
 
 
         mGameSurfaceView = new GameSurfaceView(this);

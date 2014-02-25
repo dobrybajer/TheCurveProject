@@ -20,15 +20,15 @@ public class Line {
     }
 
     public void moveStep() {
-        mX +=(float)Math.cos(mAngle)*mVel;
-        mY +=(float)Math.sin(mAngle)*mVel;
+        mX += (float) Math.cos(mAngle) * mVel;
+        mY += (float) Math.sin(mAngle) * mVel;
     }
 
     public void turnLeft() {
-        mAngle+=(float)Math.PI/angle;
+        mAngle += (float) Math.PI / angle;
     }
 
     public void turnRight() {
-        mAngle-=(float)Math.PI/angle;
+        mAngle -= (float) Math.PI / angle;
     }
 }
